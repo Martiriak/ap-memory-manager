@@ -32,7 +32,7 @@ int main()
 {
     //TestFunc();
 
-    APMemory::InitMemoryManager();
+    APMemory::InitMemoryManager(1024);
 
     Test* first = new(APMemory::Alloc(sizeof(Test))) Test();
     int* second = new(APMemory::Alloc(sizeof(int))) int();

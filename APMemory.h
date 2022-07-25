@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <iostream>
 
-#define MEMORY_POOL_SIZE 1008 //536870904 // 512 MB - 8 Bytes
+//536870912 = 512 MB
 
 namespace APMemory
 {
@@ -15,13 +15,20 @@ namespace APMemory
 
 		inline std::size_t GetSize() const
 		{
-			// to get the bytes, multiply for sizeof
-			// to get only the content of the block, subtract sizeof
-			return (this->Next - this) * sizeof(MemControlBlock) - sizeof(MemControlBlock);
+			const char* const EndOfThisBlock = (char*) (this + 1);
+			const char* const StartOfNextBlock = (char*) this->Next;
+
+			return StartOfNextBlock - EndOfThisBlock;
 		}
 	};
 
-	void InitMemoryManager();
+	enum class AllocatorType : char
+	{
+		Generic,
+		SmallObjects
+	};
+
+	void InitMemoryManager(const std::size_t TotalMemoryAvailable);
 	void ShutdownMemoryManager();
 
 	/** Uses Worst-Fit algorithm. */
