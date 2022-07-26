@@ -3,8 +3,13 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "MemControlBlock.h"
+#include "MemManagerInfo.h"
+
 namespace
 {
+	APMemory::MemManagerInfo* MemInfo = nullptr;
+
 	bool IsInitialized = false;
 
 	APMemory::MemControlBlock* FirstBlock = nullptr;
