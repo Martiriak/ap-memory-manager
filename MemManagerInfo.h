@@ -7,10 +7,9 @@ namespace APMemory
 {
 	struct MemManagerInfo
 	{
-		bool IsInitialized = false;
-		AllocatorType AllocatorInUse;
-
+		/** The first block of all the allocated memory. */
 		MemControlBlock* FirstBlock = nullptr;
+		/** Intended as a guard, it is always marked as not available. */
 		MemControlBlock* LastBlock = nullptr;
 	};
 }

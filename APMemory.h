@@ -7,19 +7,25 @@
 
 namespace APMemory
 {
+	// Not sure if I will keep this, currently unused.
 	enum class AllocatorType : char
 	{
 		Generic,
 		SmallObjects
 	};
 
-
+	/** Enables the use of APMemory functions. 
+	* @param TotalMemoryAvailable the amount of memory to allocate.
+	*/
 	void InitMemoryManager(const std::size_t TotalMemoryAvailable);
+
+	/** Deallocates all the memory previously allocated, and disables the use of APMemory functions. */
 	void ShutdownMemoryManager();
 
-	/** Uses Worst-Fit algorithm. */
+	/** Substitutes malloc(). */
 	void* Alloc(const std::size_t BytesToAlloc);
 
+	/** Substitutes free(). */
 	void Dealloc(void* SpaceToDealloc);
 
 
@@ -34,6 +40,7 @@ namespace APMemory
 		}
 	}
 
+	/** For debugging purposes, might move to another header. */
 	int GetNumberOfMemBlocks();
 
 
