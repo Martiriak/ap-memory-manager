@@ -95,7 +95,7 @@ namespace APMemory
 	void* Alloc(const std::size_t BytesToAlloc)
 	{
 		// EmptyBlock->Next is specificaly chosen to make GetSize() return 0.
-		static MemControlBlock EmptyBlock = { false, &EmptyBlock + 1, nullptr};
+		static MemControlBlock EmptyBlock = { false, &EmptyBlock + 1, nullptr };
 
 		assert(MemInfo != nullptr);
 

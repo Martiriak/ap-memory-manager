@@ -143,11 +143,13 @@
     <ClCompile Include="MemControlBlock.cpp" />
     <ClCompile Include="MemManagerInfo.cpp" />
     <ClCompile Include="Memory Manager.cpp" />
+    <ClCompile Include="SmallObjAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APMemory.h" />
     <ClInclude Include="MemControlBlock.h" />
     <ClInclude Include="MemManagerInfo.h" />
+    <ClInclude Include="SmallObjAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
