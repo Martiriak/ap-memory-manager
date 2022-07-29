@@ -97,6 +97,62 @@ namespace APMemory
 
 	void FixedAllocator::Dealloc(void* MemoryToDealloc)
 	{
+		unsigned char* const BytePointerToDeallocMemory = static_cast<unsigned char*>(MemoryToDealloc);
 
+		if (BytePointerToDeallocMemory >= DeallocChunk->Data
+			&& BytePointerToDeallocMemory < DeallocChunk->Data + (BlockSize * BlocksNumber))
+		{
+			const std::size_t DeallocChunkIndex = DeallocChunk - Chunks.data();
+			
+			bool NoMoreChunksRight = false;
+			bool NoMoreChunksLeft = false;
+
+			for (std::size_t i = 1; !NoMoreChunksRight || !NoMoreChunksLeft; ++i)
+			{
+				const std::size_t iRightChunkIndex = DeallocChunkIndex + i;
+				const std::size_t iLeftChunkIndex = DeallocChunkIndex - i;
+
+				NoMoreChunksRight = iRightChunkIndex > Chunks.size() - 1;
+				NoMoreChunksLeft = iLeftChunkIndex < 0;
+
+				if (!NoMoreChunksRight)
+				{
+					if (BytePointerToDeallocMemory >= Chunks[iRightChunkIndex].Data
+						&& BytePointerToDeallocMemory < Chunks[iRightChunkIndex].Data + (BlockSize * BlocksNumber))
+					{
+						DeallocChunk = &Chunks[iRightChunkIndex];
+						break;
+					}
+				}
+
+				if (!NoMoreChunksLeft)
+				{
+					if (BytePointerToDeallocMemory >= Chunks[iLeftChunkIndex].Data
+						&& BytePointerToDeallocMemory < Chunks[iLeftChunkIndex].Data + (BlockSize * BlocksNumber))
+					{
+						DeallocChunk = &Chunks[iLeftChunkIndex];
+						break;
+					}
+				}
+			}
+		}
+
+		DeallocChunk->Dealloc(MemoryToDealloc, BlockSize);
+
+		if (DeallocChunk->NumberOfAvailableBlocks == 0)
+		{
+			const std::size_t DeallocChunkIndex = DeallocChunk - Chunks.data();
+
+			Chunk TmpSwapVar = Chunks[Chunks.size() - 1];
+			Chunks[Chunks.size() - 1] = Chunks[DeallocChunkIndex];
+			Chunks[DeallocChunkIndex] = TmpSwapVar;
+			
+			DeallocChunk = AllocChunk;
+
+			if (Chunks[Chunks.size() - 2].NumberOfAvailableBlocks == 0)
+			{
+				Chunks.pop_back();
+			}
+		}
 	}
 }
