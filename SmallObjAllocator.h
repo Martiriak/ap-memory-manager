@@ -22,6 +22,16 @@ namespace APMemory
 	class FixedAllocator
 	{
 
+	public:
+
+		void Init(const std::size_t ChunksBlockSize, const unsigned char ChunksBlocksNumber);
+		void Reset();
+
+		inline std::size_t GetBlockSize() const { return BlockSize; }
+
+		void* Alloc();
+		void Dealloc(void* MemoryToDealloc);
+
 	private:
 
 		std::size_t BlockSize = 0;
@@ -29,8 +39,24 @@ namespace APMemory
 		std::vector<Chunk> Chunks;
 		Chunk* AllocChunk = nullptr;
 		Chunk* DeallocChunk = nullptr;
+	};
 
-		void* Alloc();
-		void Dealloc(void* MemoryToDealloc);
+	class SmallObjAllocator
+	{
+
+	public:
+
+		SmallObjAllocator(const std::size_t ChunkSize, const std::size_t MaxObjectSize);
+
+		void* Alloc(const std::size_t BytesToAlloc);
+		void Dealloc(void* MemoryToDealloc, const std::size_t SizeOfMemoryToDealloc);
+
+		static const unsigned char MinimumNumberOfBlocksInChunks = 8;
+
+	private:
+
+		std::vector<FixedAllocator> Allocators;
+		FixedAllocator* AllocAllocator = nullptr;
+		FixedAllocator* DeallocAllocator = nullptr;
 	};
 }
