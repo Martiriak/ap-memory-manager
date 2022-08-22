@@ -42,9 +42,7 @@ namespace APMemory
 		}
 	}
 
-	/** For debugging purposes, might move to another header. */
 	int GetNumberOfMemBlocks();
-
 
 } // APMemory End
 

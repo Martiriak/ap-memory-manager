@@ -38,6 +38,8 @@ namespace APMemory
 		void* Alloc(const std::size_t BytesToAlloc);
 		void Dealloc(void* SpaceToDealloc);
 
+		int GetNumberOfMemBlocks() const;
+
 	private:
 
 		/** The first block of all the allocated memory. */

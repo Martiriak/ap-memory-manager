@@ -49,6 +49,7 @@ GenericAllocator::~GenericAllocator()
 	std::cout << "Deinit!\n";
 }
 
+// Uses worst fit algorithm.
 void* GenericAllocator::Alloc(const std::size_t BytesToAlloc)
 {
 	// EmptyBlock->Next is specificaly chosen to make GetSize() return 0.
@@ -185,4 +186,18 @@ void GenericAllocator::Dealloc(void* SpaceToDealloc)
 		// No merging, just "freeing" the block.
 		BlockToDealloc->IsAvailable = true;
 	}
+}
+
+int GenericAllocator::GetNumberOfMemBlocks() const
+{
+	int NumberOfBlocks = 0;
+	const MemControlBlock* iBlock = FirstBlock;
+
+	while (iBlock != nullptr)
+	{
+		++NumberOfBlocks;
+		iBlock = iBlock->Next;
+	}
+
+	return NumberOfBlocks - 1; // -1, because the last block is counted, which in reality doesn't exist.
 }
