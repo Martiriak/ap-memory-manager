@@ -1,3 +1,5 @@
+// Alessandro Pegoraro, 2022
+
 #pragma once
 
 #include <cstdlib>

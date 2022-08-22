@@ -1,3 +1,5 @@
+// Alessandro Pegoraro, 2022
+
 #pragma once
 
 #include <cstdlib>
@@ -11,7 +13,7 @@ namespace APMemory
 		MemControlBlock* Next;
 		MemControlBlock* Previous;
 
-		inline const std::size_t GetSize() const
+		inline std::size_t GetSize() const
 		{
 			const char* const EndOfThisBlockOverhead = (char*)(this + 1);
 			const char* const StartOfNextBlock = (char*)this->Next;

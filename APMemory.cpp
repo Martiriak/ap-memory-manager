@@ -1,3 +1,5 @@
+// Alessandro Pegoraro, 2022
+
 #include "APMemory.h"
 
 #include <cstdlib>
