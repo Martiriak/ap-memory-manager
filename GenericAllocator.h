@@ -14,10 +14,9 @@ namespace APMemory
 
 		struct MemControlBlock final
 		{
-			// This motherfucker has a 7 bytes padding! Dunno how to reduce it without messing with performance...
-			bool IsAvailable;
 			MemControlBlock* Next;
 			MemControlBlock* Previous;
+			bool IsAvailable;
 
 			inline std::size_t GetSize() const
 			{

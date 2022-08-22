@@ -53,7 +53,7 @@ GenericAllocator::~GenericAllocator()
 void* GenericAllocator::Alloc(const std::size_t BytesToAlloc)
 {
 	// EmptyBlock->Next is specificaly chosen to make GetSize() return 0.
-	static MemControlBlock EmptyBlock = { false, &EmptyBlock + 1, nullptr };
+	static MemControlBlock EmptyBlock = { &EmptyBlock + 1, nullptr, false };
 
 	std::cout << "Bytes to allocate: " << BytesToAlloc << " ";
 	std::cout << "Numero totale di blocchi: " << GetNumberOfMemBlocks() << "\n";
