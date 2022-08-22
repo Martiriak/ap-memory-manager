@@ -18,22 +18,6 @@ public:
 
 void TestFunc()
 {
-    Test* standardAllocTest = new Test(5, 3.14159);
-    std::cout << "standardAllocTest Size = " << sizeof(*standardAllocTest) << '\n';
-
-    Test* apAllocTest = new(APMemory::Alloc(sizeof(Test))) Test(5, 3.14159);
-    std::cout << "apAllocTest Size = " << sizeof(*apAllocTest) << '\n';
-
-    delete standardAllocTest;
-
-    APMemory::Delete(apAllocTest);
-}
-
-
-int main()
-{
-    //TestFunc();
-
     APMemory::InitMemoryManager(1024);
 
     Test* first = new(APMemory::Alloc(sizeof(Test))) Test();
@@ -66,4 +50,10 @@ int main()
     std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
 
     APMemory::ShutdownMemoryManager();
+}
+
+
+int main()
+{
+    TestFunc();
 }
