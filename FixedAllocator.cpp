@@ -6,6 +6,8 @@
 #include <cmath>
 #include <cassert>
 
+#include <iostream>
+
 using namespace APMemory;
 
 void SmallObjAllocator::FixedAllocator::Init(const std::size_t ChunksBlockSize, const unsigned char ChunksBlocksNumber)
@@ -16,12 +18,15 @@ void SmallObjAllocator::FixedAllocator::Init(const std::size_t ChunksBlockSize, 
 
 void SmallObjAllocator::FixedAllocator::Reset()
 {
+	std::cout << "Resetting Allocator of size " << GetBlockSize() << '\n';
 	for (Chunk& iChunk : Chunks)
 	{
 		iChunk.Shutdown();
 	}
 
 	Chunks.clear();
+
+	std::cout << '\n';
 }
 
 void* SmallObjAllocator::FixedAllocator::Alloc()
@@ -30,11 +35,18 @@ void* SmallObjAllocator::FixedAllocator::Alloc()
 	{
 		LastAllocationChunk = nullptr;
 
+		std::cout << "-------> Searching Available Chunk... ";
+		int debugCount = 0;
+
 		// Find chunks available to allocate.
 		for (Chunk& iChunk : Chunks)
 		{
+			++debugCount;
+
 			if (iChunk.NumberOfAvailableBlocks != 0)
 			{
+				std::cout << "Found after " << debugCount << " cycles.\n";
+
 				LastAllocationChunk = &iChunk;
 				break;
 			}
@@ -43,6 +55,8 @@ void* SmallObjAllocator::FixedAllocator::Alloc()
 		// If there's none, make one.
 		if (LastAllocationChunk == nullptr)
 		{
+			std::cout << "Not found, creating one.\n";
+
 			Chunk NewChunk;
 			NewChunk.Init(BlockSize, BlocksNumber);
 
@@ -69,6 +83,8 @@ void SmallObjAllocator::FixedAllocator::Dealloc(void* MemoryToDealloc)
 	if (PointerToMemoryToDealloc < LastDeallocationChunk->Data
 		|| PointerToMemoryToDealloc >= LastDeallocationChunk->Data + (BlockSize * BlocksNumber))
 	{
+		std::cout << "-------> Searching Correct Chunk... ";
+
 		const std::size_t LastDeallocationChunkIndex = LastDeallocationChunk - Chunks.data();
 
 		bool NoMoreChunksRight = false;
@@ -88,6 +104,7 @@ void SmallObjAllocator::FixedAllocator::Dealloc(void* MemoryToDealloc)
 				if (PointerToMemoryToDealloc >= Chunks[iRightChunk].Data
 					&& PointerToMemoryToDealloc < Chunks[iRightChunk].Data + (BlockSize * BlocksNumber))
 				{
+					std::cout << "Found it " << i << " steps on the right.\n";
 					LastDeallocationChunk = &Chunks[iRightChunk];
 					break;
 				}
@@ -98,6 +115,7 @@ void SmallObjAllocator::FixedAllocator::Dealloc(void* MemoryToDealloc)
 				if (PointerToMemoryToDealloc >= Chunks[iLeftChunk].Data
 					&& PointerToMemoryToDealloc < Chunks[iLeftChunk].Data + (BlockSize * BlocksNumber))
 				{
+					std::cout << "Found it " << i << " steps on the left.\n";
 					LastDeallocationChunk = &Chunks[iLeftChunk];
 					break;
 				}
@@ -107,24 +125,37 @@ void SmallObjAllocator::FixedAllocator::Dealloc(void* MemoryToDealloc)
 
 	LastDeallocationChunk->Dealloc(MemoryToDealloc, BlockSize);
 
-	// If there's no more space...
-	if (LastDeallocationChunk->NumberOfAvailableBlocks == 0)
+	// If the chunk is now empty...
+	if (LastDeallocationChunk->NumberOfAvailableBlocks == BlocksNumber)
 	{
+		std::cout << "         !! Chunk has been emptied!";
+
 		// ...move the now empty chunk at the end.
 		const std::size_t LastDeallocationChunkIndex = LastDeallocationChunk - Chunks.data();
+
+		std::cout << " Empty chunk index: " << LastDeallocationChunkIndex;
 
 		Chunk TmpSwapVar = Chunks[Chunks.size() - 1];
 		Chunks[Chunks.size() - 1] = Chunks[LastDeallocationChunkIndex];
 		Chunks[LastDeallocationChunkIndex] = TmpSwapVar;
 
-		LastDeallocationChunk = LastAllocationChunk;
-
 		// If there are 2 empty chunkes, remove the last.
-		if (Chunks[Chunks.size() - 2].NumberOfAvailableBlocks == 0)
+		if (Chunks.size() > 1 && Chunks[Chunks.size() - 2].NumberOfAvailableBlocks == BlocksNumber)
 		{
+			std::cout << " Another chunk was already empty, so deleting this one.";
+
 			Chunk DiscardedChunk = Chunks.back();
 			DiscardedChunk.Shutdown();
 			Chunks.pop_back();
+
+			LastDeallocationChunk = &(Chunks.back());
+
+			if (LastAllocationChunk - Chunks.data() >= Chunks.size())
+			{
+				LastAllocationChunk = LastDeallocationChunk;
+			}
 		}
+
+		std::cout << '\n';
 	}
 }

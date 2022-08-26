@@ -6,12 +6,16 @@
 #include <cmath>
 #include <cassert>
 
+#include <iostream>
+
 using namespace APMemory;
 
 void SmallObjAllocator::FixedAllocator::Chunk::Init(const std::size_t BlockSize, const unsigned char BlocksNumber)
 {
 	assert(Data == nullptr);
 	Data = static_cast<unsigned char*>(malloc(BlockSize * BlocksNumber));
+
+	std::cout << " >>>  Chunk Init!\n";
 
 	Reset(BlockSize, BlocksNumber);
 }
@@ -36,6 +40,8 @@ void SmallObjAllocator::FixedAllocator::Chunk::Shutdown()
 	assert(Data != nullptr);
 	free(Data);
 	Data = nullptr;
+
+	std::cout << " >>>  Chunk Freed!";
 }
 
 void* SmallObjAllocator::FixedAllocator::Chunk::Alloc(const std::size_t BlockSize)
@@ -46,6 +52,8 @@ void* SmallObjAllocator::FixedAllocator::Chunk::Alloc(const std::size_t BlockSiz
 
 	FirstAvailableBlockIndex = *NewlyAllocatedBlock;
 	--NumberOfAvailableBlocks;
+
+	std::cout << "---------------> Allocated, " << static_cast<short>(NumberOfAvailableBlocks) << " blocks remaining.\n";
 
 	return NewlyAllocatedBlock;
 }
@@ -59,4 +67,6 @@ void SmallObjAllocator::FixedAllocator::Chunk::Dealloc(void* BlockToDealloc, con
 	*NewlyDeallocatedBlock = FirstAvailableBlockIndex;
 	++NumberOfAvailableBlocks;
 	FirstAvailableBlockIndex = static_cast<unsigned char>((NewlyDeallocatedBlock - Data) / BlockSize);
+
+	std::cout << "---------------> Deallocated, " << static_cast<short>(NumberOfAvailableBlocks) << " blocks available.\n";
 }

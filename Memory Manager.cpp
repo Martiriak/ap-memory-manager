@@ -1,6 +1,8 @@
 // Alessandro Pegoraro, 2022
 
 #include <iostream>
+#include <vector>
+#include <cassert>
 
 #include "APMemory.h"
 
@@ -11,9 +13,9 @@ class Test
 
 public:
 
-    Test() : test(0), testD(0.) { std::cout << "Built!\n"; }
-    Test(int _test, double _testD) : test(_test), testD(_testD) { std::cout << "Built With Pars!\n"; }
-    ~Test() { std::cout << "Destroyed!\n"; }
+    Test() : test(0), testD(0.) { /*std::cout << "Built!\n";*/ }
+    Test(int _test, double _testD) : test(_test), testD(_testD) { /*std::cout << "Built With Pars!\n";*/ }
+    ~Test() { /*std::cout << "Destroyed!\n";*/ }
 };
 
 void TestFunc()
@@ -53,7 +55,64 @@ void TestFunc()
 }
 
 
+void TestSmallAlloc()
+{
+    using namespace APMemory;
+
+    InitMemoryManager(1024);
+
+    std::vector<Test*> testObjs;
+    testObjs.reserve(200);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Test* newObj = new(Alloc(sizeof(Test))) Test();
+
+        testObjs.push_back(newObj);
+    }
+
+    std::cout << "\n\n\n";
+
+    assert(testObjs.size() == 100);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        Test* oldObj = testObjs.back();
+        Delete(oldObj);
+        testObjs.pop_back();
+    }
+
+    std::cout << "\n\n\n";
+
+    assert(testObjs.size() == 50);
+
+    for (int i = 0; i < 150; ++i)
+    {
+        Test* newObj = new(Alloc(sizeof(Test))) Test();
+
+        testObjs.push_back(newObj);
+    }
+
+    std::cout << "\n\n\n";
+
+    assert(testObjs.size() == 200);
+
+    for (int i = 0; i < 200; ++i)
+    {
+        Test* oldObj = testObjs.back();
+        Delete(oldObj);
+        testObjs.pop_back();
+    }
+
+    assert(testObjs.size() == 0);
+
+    ShutdownMemoryManager();
+}
+
+
 int main()
 {
-    TestFunc();
+    //TestFunc();
+    TestSmallAlloc();
+
 }

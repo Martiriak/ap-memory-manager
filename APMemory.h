@@ -28,7 +28,7 @@ namespace APMemory
 	void* Alloc(const std::size_t BytesToAlloc);
 
 	/** Substitutes free(). */
-	void Dealloc(void* SpaceToDealloc);
+	void Dealloc(void* SpaceToDealloc, const std::size_t ObjectSize);
 
 
 	/** Utility function to emulate the delete operator. */
@@ -38,7 +38,7 @@ namespace APMemory
 		if (ObjToDealloc != nullptr)
 		{
 			ObjToDealloc->~T();
-			Dealloc(ObjToDealloc);
+			Dealloc(ObjToDealloc, sizeof(T));
 		}
 	}
 

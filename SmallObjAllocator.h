@@ -59,12 +59,12 @@ namespace APMemory
 		void* Alloc(const std::size_t BytesToAlloc);
 		void Dealloc(void* MemoryToDealloc, const std::size_t SizeOfMemoryToDealloc);
 
-		static const unsigned char MinimumNumberOfBlocksInChunks = 8;
-
 	private:
 
 		std::vector<FixedAllocator> Allocators;
 		FixedAllocator* LastAllocationAllocator = nullptr;
 		FixedAllocator* LastDeallocationAllocator = nullptr;
+
+		static const unsigned char MinimumNumberOfBlocksInChunks = 8;
 	};
 }
