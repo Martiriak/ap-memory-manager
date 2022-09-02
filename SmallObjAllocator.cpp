@@ -59,7 +59,8 @@ void* SmallObjAllocator::Alloc(const std::size_t BytesToAlloc)
 {
 	if (BytesToAlloc == 0 || BytesToAlloc > Allocators.back().GetBlockSize()) return nullptr;
 
-	if (LastAllocationAllocator == nullptr || BytesToAlloc > LastAllocationAllocator->GetBlockSize())
+	if (LastAllocationAllocator == nullptr || BytesToAlloc > LastAllocationAllocator->GetBlockSize()
+		|| BytesToAlloc <= LastAllocationAllocator->GetBlockSize() / 2)
 	{
 		std::cout << "----> Searching Available Allocator... ";
 		int debugCount = 0;
@@ -88,7 +89,8 @@ void SmallObjAllocator::Dealloc(void* MemoryToDealloc, const std::size_t SizeOfM
 {
 	if (MemoryToDealloc == nullptr) return;
 
-	if (LastDeallocationAllocator == nullptr || SizeOfMemoryToDealloc > LastDeallocationAllocator->GetBlockSize())
+	if (LastDeallocationAllocator == nullptr || SizeOfMemoryToDealloc > LastDeallocationAllocator->GetBlockSize()
+		|| SizeOfMemoryToDealloc <= LastDeallocationAllocator->GetBlockSize() / 2)
 	{
 		std::cout << "----> Searching Correct Allocator... ";
 		int debugCount = 0;

@@ -18,6 +18,11 @@ public:
     ~Test() { /*std::cout << "Destroyed!\n";*/ }
 };
 
+class Byte48
+{
+    double x, y, z, w, v, u;
+};
+
 void TestFunc()
 {
     APMemory::InitMemoryManager(1024);
@@ -55,7 +60,7 @@ void TestFunc()
 }
 
 
-void TestSmallAlloc()
+void TestSmallAlloc1()
 {
     using namespace APMemory;
 
@@ -109,10 +114,133 @@ void TestSmallAlloc()
     ShutdownMemoryManager();
 }
 
+void TestSmallAlloc2()
+{
+    using namespace APMemory;
+
+    InitMemoryManager(1024);
+
+    std::vector<Test*> Obj16;
+    std::vector<int*> Obj04;
+    std::vector<Byte48*> Obj48;
+    Obj16.reserve(150);
+    Obj04.reserve(250);
+    Obj48.reserve(100);
+
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Test* newObj = new(Alloc(sizeof(Test))) Test();
+
+        Obj16.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj16.size() == 100);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        int* newObj = new(Alloc(sizeof(int))) int;
+
+        Obj04.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj04.size() == 50);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Byte48* newObj = new(Alloc(sizeof(Byte48))) Byte48();
+
+        Obj48.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj48.size() == 100);
+
+
+
+    for (int i = 0; i < 50; ++i)
+    {
+        int* oldObj = Obj04.back();
+        Delete(oldObj);
+        Obj04.pop_back();
+    }
+    std::cout << "\n\n\n";
+    assert(Obj04.size() == 0);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        Byte48* oldObj = Obj48.back();
+        Delete(oldObj);
+        Obj48.pop_back();
+    }
+    std::cout << "\n\n\n";
+    assert(Obj48.size() == 50);
+
+
+
+    for (int i = 0; i < 50; ++i)
+    {
+        Test* newObj = new(Alloc(sizeof(Test))) Test();
+
+        Obj16.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj16.size() == 150);
+
+    for (int i = 0; i < 250; ++i)
+    {
+        int* newObj = new(Alloc(sizeof(int))) int;
+
+        Obj04.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj04.size() == 250);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        Byte48* newObj = new(Alloc(sizeof(Byte48))) Byte48;
+
+        Obj48.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj48.size() == 100);
+
+
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Byte48* oldObj = Obj48.back();
+        Delete(oldObj);
+        Obj48.pop_back();
+    }
+    std::cout << "\n\n\n";
+    assert(Obj48.size() == 0);
+
+    for (int i = 0; i < 250; ++i)
+    {
+        int* oldObj = Obj04.back();
+        Delete(oldObj);
+        Obj04.pop_back();
+    }
+    std::cout << "\n\n\n";
+    assert(Obj04.size() == 0);
+
+    for (int i = 0; i < 150; ++i)
+    {
+        Test* oldObj = Obj16.back();
+        Delete(oldObj);
+        Obj16.pop_back();
+    }
+    std::cout << "\n\n\n";
+    assert(Obj16.size() == 0);
+
+
+    ShutdownMemoryManager();
+}
+
 
 int main()
 {
     //TestFunc();
-    TestSmallAlloc();
+    TestSmallAlloc2();
 
 }
