@@ -14,84 +14,109 @@ using namespace APMemory;
 
 namespace
 {
+	const std::size_t ChunkSize = 16;
+	const std::size_t MaxSmallObjSize = 1024;
+
+	const std::size_t GenericMemoryAvailable = 1024 * 12; // Will be removed after the rework on the generic allocator.
+
+	unsigned char bAtExitRegistered = false;
+
 	GenericAllocator* GenAlloc = nullptr;
 	SmallObjAllocator* SmallAlloc = nullptr;
-}
 
+	void ShutdownMemoryManager();
 
-void APMemory::InitMemoryManager(const std::size_t TotalMemoryAvailable)
-{
-	if (GenAlloc != nullptr)
+	inline void LazyInitGenericAllocator()
 	{
-		std::cerr << "Error: Memory Manager already initialized!\n";
-		return;
+		if (GenAlloc != nullptr) return;
+
+		GenAlloc = static_cast<GenericAllocator*>(malloc(sizeof(GenericAllocator)));
+
+		if (GenAlloc == nullptr)
+		{
+			std::cerr << "Error: Failed to initialize generic allocator.\n";
+			return;
+		}
+
+		GenAlloc = new(GenAlloc) GenericAllocator(GenericMemoryAvailable);
 	}
 
-	GenAlloc = static_cast<GenericAllocator*>(malloc(sizeof(GenericAllocator)));
-
-	if (GenAlloc == nullptr)
+	inline void LazyInitSmallObjAllocator()
 	{
-		std::cerr << "Error: Failed to initialize Memory Manager.\n";
-		return;
+		if (SmallAlloc != nullptr) return;
+
+		SmallAlloc = static_cast<SmallObjAllocator*>(malloc(sizeof(SmallObjAllocator)));
+
+		if (SmallAlloc == nullptr)
+		{
+			std::cerr << "Error: Failed to initialize small object allocator.\n";
+			return;
+		}
+
+		SmallAlloc = new(SmallAlloc) SmallObjAllocator(ChunkSize, MaxSmallObjSize);
 	}
 
-	GenAlloc = new(GenAlloc) GenericAllocator(TotalMemoryAvailable);
-}
-
-void APMemory::ShutdownMemoryManager()
-{
-	if (GenAlloc == nullptr)
+	inline void RegisterExitIfNotAlready()
 	{
-		std::cerr << "Error: Attempting to shutdown uninitialized Memory Manager!\n";
-		return;
-	}
+		if (bAtExitRegistered) return;
 
-	if (SmallAlloc != nullptr)
-	{
-		SmallAlloc->~SmallObjAllocator();
-		free(SmallAlloc);
-		SmallAlloc = nullptr;
-	}
+		const int Result = std::atexit(ShutdownMemoryManager);
 
-	GenAlloc->~GenericAllocator();
-	free(GenAlloc);
-	GenAlloc = nullptr;
+		if (Result != 0)
+		{
+			std::cout << "\n\n\t!!Something went wrong with registration!!\n\n";
+			return;
+		}
+
+		bAtExitRegistered = true;
+
+		std::cout << "\n\n\t!!Registered!!\n\n";
+	}
 }
 
 
 
 void* APMemory::Alloc(const std::size_t BytesToAlloc)
 {
-	/*assert(GenAlloc != nullptr);
-	return GenAlloc->Alloc(BytesToAlloc);*/
+	RegisterExitIfNotAlready();
 
-	if (SmallAlloc == nullptr)
+	if (BytesToAlloc > MaxSmallObjSize)
 	{
-		SmallAlloc = new(malloc(sizeof(SmallObjAllocator))) SmallObjAllocator(16, 1024);
+		LazyInitGenericAllocator();
 
-		if (SmallAlloc == nullptr)
-		{
-			std::cerr << "Error: Failed to initialize small object allocator.\n";
-			return nullptr;
-		}
+		if (GenAlloc != nullptr) return GenAlloc->Alloc(BytesToAlloc);
+	}
+	else
+	{
+		LazyInitSmallObjAllocator();
+
+		if (SmallAlloc != nullptr) return SmallAlloc->Alloc(BytesToAlloc);
 	}
 
-	return SmallAlloc->Alloc(BytesToAlloc);
+	return nullptr;
 }
 
 
 void APMemory::Dealloc(void* SpaceToDealloc, const std::size_t ObjectSize)
 {
-	/*assert(GenAlloc != nullptr);
-	GenAlloc->Dealloc(SpaceToDealloc);*/
-
-	if (SmallAlloc == nullptr)
+	if (ObjectSize > MaxSmallObjSize)
 	{
-		std::cerr << "Error: Attempted deallocation of nothing.\n";
-		return;
+		if (GenAlloc != nullptr)
+		{
+			GenAlloc->Dealloc(SpaceToDealloc);
+			return;
+		}
+	}
+	else
+	{
+		if (SmallAlloc != nullptr) 
+		{
+			SmallAlloc->Dealloc(SpaceToDealloc, ObjectSize);
+			return;
+		}
 	}
 
-	SmallAlloc->Dealloc(SpaceToDealloc, ObjectSize);
+	std::cerr << "Error: Attempted deallocation of unallocated memory.\n";
 }
 
 
@@ -99,4 +124,27 @@ int APMemory::GetNumberOfMemBlocks()
 {
 	assert(GenAlloc != nullptr);
 	return GenAlloc->GetNumberOfMemBlocks();
+}
+
+
+namespace
+{
+	void ShutdownMemoryManager()
+	{
+		if (GenAlloc != nullptr)
+		{
+			GenAlloc->~GenericAllocator();
+			free(GenAlloc);
+			GenAlloc = nullptr;
+		}
+
+		if (SmallAlloc != nullptr)
+		{
+			SmallAlloc->~SmallObjAllocator();
+			free(SmallAlloc);
+			SmallAlloc = nullptr;
+		}
+
+		std::cout << "\n\n\t!!Ripulito!!\n\n";
+	}
 }

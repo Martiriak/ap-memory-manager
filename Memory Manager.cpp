@@ -23,10 +23,18 @@ class Byte48
     double x, y, z, w, v, u;
 };
 
+class VeryBigData
+{
+    Test *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14,
+        *a15, *a16, *a17, *a18, *a19, *a20, *a21, *a22, *a23, *a24, *a25, *a26, *a27,
+        *a28, *a29, *a30, *a31, *a32, *a33, *a34, *a35, *a36, *a37, *a38, *a39, *a40,
+        *a41, *a42, *a43, *a44, *a45, *a46, *a47, *a48, *a49, *a50;
+
+    Byte48 b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17;
+};
+
 void TestFunc()
 {
-    APMemory::InitMemoryManager(1024);
-
     Test* first = new(APMemory::Alloc(sizeof(Test))) Test();
     int* second = new(APMemory::Alloc(sizeof(int))) int();
     Test* third = new(APMemory::Alloc(sizeof(Test))) Test();
@@ -55,16 +63,12 @@ void TestFunc()
     APMemory::Delete(sixth);
     std::cout << "Apposto il sesto: " << APMemory::GetNumberOfMemBlocks() << '\n';
     std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-
-    APMemory::ShutdownMemoryManager();
 }
 
 
 void TestSmallAlloc1()
 {
     using namespace APMemory;
-
-    InitMemoryManager(1024);
 
     std::vector<Test*> testObjs;
     testObjs.reserve(200);
@@ -110,15 +114,11 @@ void TestSmallAlloc1()
     }
 
     assert(testObjs.size() == 0);
-
-    ShutdownMemoryManager();
 }
 
 void TestSmallAlloc2()
 {
     using namespace APMemory;
-
-    InitMemoryManager(1024);
 
     std::vector<Test*> Obj16;
     std::vector<int*> Obj04;
@@ -232,15 +232,45 @@ void TestSmallAlloc2()
     }
     std::cout << "\n\n\n";
     assert(Obj16.size() == 0);
+}
 
+void TestBothAlloc()
+{
+    using namespace APMemory;
 
-    ShutdownMemoryManager();
+    VeryBigData* vbd = new(Alloc(sizeof(VeryBigData))) VeryBigData;
+
+    std::vector<Byte48*> Obj48; Obj48.reserve(100);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Byte48* newObj = new(Alloc(sizeof(Byte48))) Byte48();
+
+        Obj48.push_back(newObj);
+    }
+    std::cout << "\n\n\n";
+    assert(Obj48.size() == 100);
+
+    VeryBigData* vbd2 = new(Alloc(sizeof(VeryBigData))) VeryBigData;
+    VeryBigData* vbd3 = new(Alloc(sizeof(VeryBigData))) VeryBigData;
+
+    Delete(vbd2);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        Byte48* oldObj = Obj48.back();
+        Delete(oldObj);
+        Obj48.pop_back();
+    }
+    std::cout << "\n\n\n";
+
+    Delete(vbd3);
+    Delete(vbd);
 }
 
 
 int main()
 {
-    //TestFunc();
+    TestSmallAlloc1();
     TestSmallAlloc2();
-
 }
