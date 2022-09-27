@@ -6,7 +6,6 @@
 
 #include "APMemory.h"
 
-#define APMEMORY_OVERRIDE_DEFAULT_NEW_DELETE
 
 class Test
 {
@@ -34,38 +33,6 @@ class VeryBigData
 
     Byte48 b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17;
 };
-
-void TestFunc()
-{
-    Test* first = new(APMemory::Alloc(sizeof(Test))) Test();
-    int* second = new(APMemory::Alloc(sizeof(int))) int();
-    Test* third = new(APMemory::Alloc(sizeof(Test))) Test();
-    double* fourth = new(APMemory::Alloc(sizeof(double))) double();
-    Test* fifth = new(APMemory::Alloc(sizeof(Test))) Test();
-    double* sixth = new(APMemory::Alloc(sizeof(double))) double();
-
-    std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-
-    APMemory::Delete(third);
-    std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    APMemory::Delete(fourth);
-    std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-
-    fourth = new(APMemory::Alloc(sizeof(double))) double();
-    std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-
-    APMemory::Delete(first);
-    std::cout << "Apposto il primo: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    APMemory::Delete(second);
-    std::cout << "Apposto il secondo: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    APMemory::Delete(fourth);
-    std::cout << "Apposto il quarto: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    APMemory::Delete(fifth);
-    std::cout << "Apposto il quinto: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    APMemory::Delete(sixth);
-    std::cout << "Apposto il sesto: " << APMemory::GetNumberOfMemBlocks() << '\n';
-    std::cout << "Numero di blocchi: " << APMemory::GetNumberOfMemBlocks() << '\n';
-}
 
 
 void TestSmallAlloc1()
@@ -270,13 +237,19 @@ void TestBothAlloc()
     Delete(vbd);
 }
 
+void TestNewDelete()
+{
+    Byte48* one = new Byte48;
+    delete one;
+
+    VeryBigData* two = new VeryBigData;
+    delete two;
+
+    Test* three = new Test[3];
+    delete[] three;
+}
 
 int main()
 {
-    TestSmallAlloc1();
-    TestSmallAlloc2();
-    TestBothAlloc();
-
-    Byte48* Obj = new Byte48();
-    delete Obj;
+    TestNewDelete();
 }

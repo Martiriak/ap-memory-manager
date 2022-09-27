@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include "APAllocators.h"
+
 namespace APMemory
 {
 	class SmallObjAllocator final
@@ -44,7 +46,7 @@ namespace APMemory
 
 			std::size_t BlockSize = 0;
 			unsigned char BlocksNumber = 0;
-			std::vector<Chunk> Chunks;
+			std::vector<Chunk, CHeapAllocator<Chunk>> Chunks;
 			Chunk* LastAllocationChunk = nullptr;
 			Chunk* LastDeallocationChunk = nullptr;
 		};
@@ -61,7 +63,7 @@ namespace APMemory
 
 	private:
 
-		std::vector<FixedAllocator> Allocators;
+		std::vector<FixedAllocator, CHeapAllocator<FixedAllocator>> Allocators;
 		FixedAllocator* LastAllocationAllocator = nullptr;
 		FixedAllocator* LastDeallocationAllocator = nullptr;
 

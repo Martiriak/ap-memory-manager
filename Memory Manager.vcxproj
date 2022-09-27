@@ -116,6 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="APAllocators.cpp" />
     <ClCompile Include="APMemory.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="FixedAllocator.cpp" />
@@ -147,9 +150,9 @@
     <ClCompile Include="SmallObjAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="APAllocators.h" />
     <ClInclude Include="APMemory.h" />
     <ClInclude Include="GenericAllocator.h" />
-    <ClInclude Include="APMemOperatorsOverride.h" />
     <ClInclude Include="SmallObjAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,6 @@
 // Alessandro Pegoraro, 2022
 
+#define APMEMORY_DISABLE_NEW_DELETE_OVERRIDE
 #include "APMemory.h"
 
 #include <cstdlib>
@@ -73,20 +74,6 @@ namespace
 }
 
 
-#ifdef APMEMORY_OVERRIDE_DEFAULT_NEW_DELETE
-void* operator new(std::size_t Size)
-{
-	return APMemory::Alloc(Size);
-}
-
-void operator delete(void* PtrToMemory, std::size_t ObjSize)
-{
-	APMemory::Dealloc(PtrToMemory, ObjSize);
-}
-#endif
-
-
-
 void* APMemory::Alloc(const std::size_t BytesToAlloc)
 {
 	RegisterExitIfNotAlready();
@@ -128,13 +115,6 @@ void APMemory::Dealloc(void* SpaceToDealloc, const std::size_t ObjectSize)
 	}
 
 	std::cerr << "Error: Attempted deallocation of unallocated memory.\n";
-}
-
-
-int APMemory::GetNumberOfMemBlocks()
-{
-	assert(GenAlloc != nullptr);
-	return GenAlloc->GetNumberOfMemBlocks();
 }
 
 

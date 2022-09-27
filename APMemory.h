@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cstddef>
+#include <new>
 
 //536870912 = 512 MB
 
@@ -26,6 +27,28 @@ namespace APMemory
 		}
 	}
 
-	int GetNumberOfMemBlocks();
-
 } // APMemory End
+
+
+
+#ifndef APMEMORY_DISABLE_NEW_DELETE_OVERRIDE
+inline void* operator new(std::size_t Size)
+{
+	return APMemory::Alloc(Size);
+}
+
+inline void* operator new[](std::size_t Size)
+{
+	return APMemory::Alloc(Size);
+}
+
+inline void operator delete(void* PtrToMemory, std::size_t ObjSize)
+{
+	APMemory::Dealloc(PtrToMemory, ObjSize);
+}
+
+inline void operator delete[](void* PtrToMemory, std::size_t ObjSize)
+{
+	APMemory::Dealloc(PtrToMemory, ObjSize);
+}
+#endif

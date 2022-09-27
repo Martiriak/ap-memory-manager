@@ -33,6 +33,9 @@
     <ClCompile Include="GenericAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="APAllocators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APMemory.h">
@@ -44,7 +47,7 @@
     <ClInclude Include="GenericAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="APMemOperatorsOverride.h">
+    <ClInclude Include="APAllocators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
