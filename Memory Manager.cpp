@@ -6,6 +6,8 @@
 
 #include "APMemory.h"
 
+#define APMEMORY_OVERRIDE_DEFAULT_NEW_DELETE
+
 class Test
 {
     int test;
@@ -273,4 +275,8 @@ int main()
 {
     TestSmallAlloc1();
     TestSmallAlloc2();
+    TestBothAlloc();
+
+    Byte48* Obj = new Byte48();
+    delete Obj;
 }

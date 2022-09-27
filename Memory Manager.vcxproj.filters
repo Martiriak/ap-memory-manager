@@ -44,5 +44,8 @@
     <ClInclude Include="GenericAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="APMemOperatorsOverride.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

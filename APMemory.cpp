@@ -69,10 +69,21 @@ namespace
 		}
 
 		bAtExitRegistered = true;
-
-		std::cout << "\n\n\t!!Registered!!\n\n";
 	}
 }
+
+
+#ifdef APMEMORY_OVERRIDE_DEFAULT_NEW_DELETE
+void* operator new(std::size_t Size)
+{
+	return APMemory::Alloc(Size);
+}
+
+void operator delete(void* PtrToMemory, std::size_t ObjSize)
+{
+	APMemory::Dealloc(PtrToMemory, ObjSize);
+}
+#endif
 
 
 

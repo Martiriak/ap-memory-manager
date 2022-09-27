@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="APMemory.h" />
     <ClInclude Include="GenericAllocator.h" />
+    <ClInclude Include="APMemOperatorsOverride.h" />
     <ClInclude Include="SmallObjAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
